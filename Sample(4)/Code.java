@@ -3,8 +3,6 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.InputMismatchException;
 
-// --- Book Class ---
-// Represents a single book with its properties and state.
 class Book {
     private String title;
     private String author;
@@ -20,7 +18,6 @@ class Book {
         this.checkedOutByPatronId = null;
     }
 
-    // Getter methods
     public String getTitle() {
         return this.title;
     }
@@ -41,7 +38,6 @@ class Book {
         return this.checkedOutByPatronId;
     }
 
-    // Setter methods
     public void setAvailability(boolean status) {
         this.isAvailable = status;
     }
@@ -50,7 +46,6 @@ class Book {
         this.checkedOutByPatronId = patronId;
     }
 
-    // Method to display a book's information
     public void displayBookInfo() {
         System.out.println("  Title: " + this.title);
         System.out.println("  Author: " + this.author);
@@ -62,8 +57,6 @@ class Book {
     }
 }
 
-// --- Patron Class ---
-// Represents a library member with their details and checked-out books.
 class Patron {
     private String name;
     private String patronId;
@@ -75,7 +68,6 @@ class Patron {
         this.checkedOutBooks = new ArrayList<>();
     }
 
-    // Getter methods
     public String getName() {
         return this.name;
     }
@@ -88,19 +80,15 @@ class Patron {
         return this.checkedOutBooks;
     }
 
-    // Method to add a book to the patron's checked-out list
     public void checkOutBook(String bookTitle) {
         this.checkedOutBooks.add(bookTitle);
     }
 
-    // Method to remove a book from the patron's checked-out list
     public void returnBook(String bookTitle) {
         this.checkedOutBooks.remove(bookTitle);
     }
 }
 
-// --- Library Class ---
-// The core class that manages all books and patrons.
 class Library {
     private List<Book> books;
     private List<Patron> patrons;
@@ -110,19 +98,16 @@ class Library {
         this.patrons = new ArrayList<>();
     }
 
-    // Method to add a book to the library
     public void addBook(Book newBook) {
         this.books.add(newBook);
         System.out.println("Book added successfully: " + newBook.getTitle());
     }
 
-    // Method to add a patron to the system
     public void addPatron(Patron newPatron) {
         this.patrons.add(newPatron);
         System.out.println("Patron added successfully: " + newPatron.getName());
     }
 
-    // Find a book by its title
     public Book findBookByTitle(String title) {
         for (Book book : this.books) {
             if (book.getTitle().equalsIgnoreCase(title)) {
@@ -132,7 +117,6 @@ class Library {
         return null;
     }
 
-    // Find a patron by their ID
     public Patron findPatronById(String patronId) {
         for (Patron patron : this.patrons) {
             if (patron.getPatronId().equalsIgnoreCase(patronId)) {
@@ -142,7 +126,6 @@ class Library {
         return null;
     }
 
-    // List all books in the library
     public void listAllBooks() {
         if (this.books.isEmpty()) {
             System.out.println("The library has no books.");
@@ -155,7 +138,6 @@ class Library {
         }
     }
 
-    // List all patrons in the system
     public void listAllPatrons() {
         if (this.patrons.isEmpty()) {
             System.out.println("No patrons registered yet.");
@@ -167,7 +149,6 @@ class Library {
         }
     }
 
-    // Search for a book by author
     public void findBookByAuthor(String author) {
         System.out.println("Searching for books by: " + author);
         boolean found = false;
@@ -183,7 +164,6 @@ class Library {
         }
     }
 
-    // Check out a book to a patron
     public void checkOutBookForPatron(Scanner scanner) {
         System.out.print("Enter patron ID: ");
         String patronId = scanner.nextLine();
@@ -213,7 +193,6 @@ class Library {
         }
     }
 
-    // Return a book from a patron
     public void returnBookFromPatron(Scanner scanner) {
         System.out.print("Enter patron ID: ");
         String patronId = scanner.nextLine();
@@ -243,7 +222,6 @@ class Library {
         }
     }
 
-    // View books checked out by a specific patron
     public void listPatronBooks(Scanner scanner) {
         System.out.print("Enter patron ID: ");
         String patronId = scanner.nextLine();
@@ -266,13 +244,11 @@ class Library {
     }
 }
 
-// --- Main Class and Program Entry Point ---
 public class LibrarySystem {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         Library myLibrary = new Library();
 
-        // Add some initial books and patrons
         myLibrary.addBook(new Book("The Lord of the Rings", "J.R.R. Tolkien", 1954));
         myLibrary.addBook(new Book("1984", "George Orwell", 1949));
         myLibrary.addBook(new Book("Dune", "Frank Herbert", 1965));
@@ -282,7 +258,6 @@ public class LibrarySystem {
 
         int choice;
         do {
-            // Display menu
             System.out.println("\n--- Library Management System Menu ---");
             System.out.println("1. List all books");
             System.out.println("2. Search for books by author");
@@ -297,7 +272,7 @@ public class LibrarySystem {
             try {
                 System.out.print("Enter your choice: ");
                 choice = scanner.nextInt();
-                scanner.nextLine(); // Consume the newline left-over
+                scanner.nextLine(); 
 
                 switch (choice) {
                     case 1:
@@ -346,11 +321,11 @@ public class LibrarySystem {
                 }
             } catch (InputMismatchException e) {
                 System.out.println("Invalid input. Please enter a number from the menu.");
-                scanner.nextLine(); // Clear the invalid input from the scanner
-                choice = 0; // Set choice to 0 to continue the loop
+                scanner.nextLine();
+                choice = 0; 
             }
         } while (choice != 9);
         
-        scanner.close(); // Close the scanner to prevent resource leak
+        scanner.close(); 
     }
 }
