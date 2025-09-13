@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+
 #define MAX_TITLE_LENGTH 100
 #define MAX_AUTHOR_LENGTH 50
 #define MAX_NAME_LENGTH 50
