@@ -3,70 +3,53 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-
-// Define maximum sizes for strings to prevent buffer overflows
 #define MAX_TITLE_LENGTH 100
 #define MAX_AUTHOR_LENGTH 50
 #define MAX_NAME_LENGTH 50
 #define MAX_ID_LENGTH 20
 
-// --- Structs for Data Representation ---
-// C's equivalent to classes for storing data.
-
-// Represents a single book.
 typedef struct {
     char title[MAX_TITLE_LENGTH];
     char author[MAX_AUTHOR_LENGTH];
     int publicationYear;
-    int isAvailable; // 1 for true, 0 for false
+    int isAvailable; 
     char checkedOutByPatronID[MAX_ID_LENGTH];
 } Book;
 
-// Represents a list of book titles a patron has checked out.
 typedef struct {
-    char** titles; // A dynamic array of strings (pointers to char arrays)
+    char** titles; 
     int count;
     int capacity;
 } StringList;
 
-// Represents a library member.
 typedef struct {
     char name[MAX_NAME_LENGTH];
     char patronID[MAX_ID_LENGTH];
     StringList checkedOutBooks;
 } Patron;
 
-// Represents a dynamic list of Books.
 typedef struct {
-    Book* books; // A dynamic array of Book structs
+    Book* books; 
     int count;
     int capacity;
 } BookList;
 
-// Represents a dynamic list of Patrons.
 typedef struct {
-    Patron* patrons; // A dynamic array of Patron structs
+    Patron* patrons; 
     int count;
     int capacity;
 } PatronList;
 
-// The main library system struct.
 typedef struct {
     BookList bookList;
     PatronList patronList;
 } Library;
 
-
-// --- Function Prototypes ---
-// Function declarations to allow them to be called before they are defined.
-
-// Utility functions for string and input handling
 void clearInputBuffer();
 int getIntegerInput();
 void getStringInput(const char* prompt, char* buffer, int bufferSize);
 int customStrICmp(const char* s1, const char* s2);
 
-// Dynamic list management functions
 void initializeBookList(BookList* list);
 void addBookToList(BookList* list, const Book* book);
 void initializePatronList(PatronList* list);
