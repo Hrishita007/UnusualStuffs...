@@ -62,7 +62,6 @@ func (l *Library) findBookByTitle(title string) *Book {
 	return nil
 }
 
-// findPatronByID finds a patron by their ID (case-insensitive).
 func (l *Library) findPatronByID(id string) *Patron {
 	for _, patron := range l.Patrons {
 		if strings.EqualFold(patron.PatronID, id) {
@@ -72,7 +71,6 @@ func (l *Library) findPatronByID(id string) *Patron {
 	return nil
 }
 
-// listAllBooks displays all books in the library.
 func (l *Library) listAllBooks() {
 	if len(l.Books) == 0 {
 		fmt.Println("The library has no books.")
@@ -91,7 +89,6 @@ func (l *Library) listAllBooks() {
 	}
 }
 
-// listAllPatrons displays all patrons.
 func (l *Library) listAllPatrons() {
 	if len(l.Patrons) == 0 {
 		fmt.Println("No patrons registered yet.")
