@@ -22,19 +22,15 @@ type Patron struct {
 	CheckedOutBooks []string
 }
 
-// --- Library Struct ---
-// The main struct that manages all books and patrons.
 type Library struct {
 	Books   []*Book
 	Patrons []*Patron
 }
 
-// NewLibrary creates and initializes a new Library instance.
 func NewLibrary() *Library {
 	return &Library{}
 }
 
-// AddBook adds a new book to the library.
 func (l *Library) AddBook(title, author string, year int) {
 	newBook := &Book{
 		Title:           title,
@@ -46,7 +42,6 @@ func (l *Library) AddBook(title, author string, year int) {
 	fmt.Printf("Book added successfully: %s\n", title)
 }
 
-// AddPatron adds a new patron to the library.
 func (l *Library) AddPatron(name, id string) {
 	newPatron := &Patron{
 		Name:            name,
