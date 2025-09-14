@@ -16,8 +16,6 @@ type Book struct {
 	CheckedOutByPatronID string
 }
 
-// --- Patron Struct ---
-// Represents a library member.
 type Patron struct {
 	Name            string
 	PatronID        string
