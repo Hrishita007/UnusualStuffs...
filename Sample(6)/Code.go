@@ -52,7 +52,7 @@ func (l *Library) AddPatron(name, id string) {
 	fmt.Printf("Patron added successfully: %s\n", name)
 }
 
-// findBookByTitle finds a book by its title (case-insensitive).
+
 func (l *Library) findBookByTitle(title string) *Book {
 	for _, book := range l.Books {
 		if strings.EqualFold(book.Title, title) {
