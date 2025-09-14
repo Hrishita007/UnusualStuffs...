@@ -8,8 +8,6 @@ import (
 	"strings"
 )
 
-// --- Book Struct ---
-// Represents a single book.
 type Book struct {
 	Title             string
 	Author            string
