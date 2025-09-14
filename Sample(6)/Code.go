@@ -100,7 +100,6 @@ func (l *Library) listAllPatrons() {
 	}
 }
 
-// findBookByAuthor searches for books by a given author (case-insensitive).
 func (l *Library) findBookByAuthor(author string) {
 	fmt.Printf("Searching for books by: %s\n", author)
 	found := false
