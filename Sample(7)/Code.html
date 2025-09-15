@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Dashboard</title>
+    <!-- Use Tailwind CSS for rapid styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Use Chart.js for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Use a modern font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            transition: background-color 0.3s ease;
+        }
+        .container {
+            min-height: 100vh;
+            display: flex;
+            transition: all 0.3s ease;
+        }
+        .sidebar {
+            width: 280px;
+            background-color: #1f2937;
+            color: white;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            transition: width 0.3s ease;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 10;
+        }
+        .content {
+            margin-left: 280px;
+            flex-grow: 1;
+            padding: 2rem;
+            transition: margin-left 0.3s ease;
+        }
+        .nav-button {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.25rem;
+            border-radius: 9999px;
+            text-align: left;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+        .nav-button:hover {
+            background-color: #374151;
+            transform: scale(1.02);
+        }
+        .nav-button.active {
+            background-color: #4b5563;
+        }
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        .view-section {
+            display: none;
+        }
+        .view-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .table-container {
+            overflow-x: auto;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .data-table th, .data-table td {
+            text-align: left;
+            padding: 0.75rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .data-table th {
+            background-color: #f9fafb;
+            font-weight: 600;
+            color: #4b5563;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="text-2xl font-bold mb-8 text-center text-blue-400">
+                Data Dashboard
+            </div>
+            <!-- Dashboard View Button -->
+            <button class="nav-button active" data-view="dashboard-view">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 10v11m6-9v9m6-5v5m6-5v5m-19 3h18a2 2 0 002-2V8a2 2 0 00-2-2H3a2 2 0 00-2 2v9a2 2 0 002 2z" />
+                </svg>
+                Dashboard
+            </button>
+            <!-- Table View Button -->
+            <button class="nav-button" data-view="table-view">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                </svg>
+                Data Table
+            </button>
+            <!-- Settings View Button -->
+            <button class="nav-button" data-view="settings-view">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.44 2.572-1.065z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                Settings
+            </button>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="content">
+            <!-- Header Section -->
+            <header class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-800">Analytics Dashboard</h1>
+                <p class="text-gray-500 mt-2">Interactive data visualization and management system.</p>
+            </header>
+
+            <!-- Dashboard View -->
+            <section id="dashboard-view" class="view-section active">
+                <div class="card">
+                    <h2 class="text-xl font-semibold mb-4 text-gray-700">Performance Metrics</h2>
+                    <canvas id="myChart"></canvas>
+                </div>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="card flex flex-col items-center justify-center p-6">
+                        <span class="text-4xl font-bold text-blue-500" id="total-revenue"></span>
+                        <p class="text-gray-500">Total Revenue</p>
+                    </div>
+                    <div class="card flex flex-col items-center justify-center p-6">
+                        <span class="text-4xl font-bold text-green-500" id="new-users"></span>
+                        <p class="text-gray-500">New Users</p>
+                    </div>
+                    <div class="card flex flex-col items-center justify-center p-6">
+                        <span class="text-4xl font-bold text-yellow-500" id="conversion-rate"></span>
+                        <p class="text-gray-500">Conversion Rate</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Data Table View -->
+            <section id="table-view" class="view-section">
+                <div class="card">
+                    <h2 class="text-xl font-semibold mb-4 text-gray-700">Raw Data Table</h2>
+                    <div class="table-container">
+                        <table class="data-table w-full">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Product</th>
+                                    <th>Category</th>
+                                    <th>Sales</th>
+                                </tr>
+                            </thead>
+                            <tbody id="data-table-body">
+                                <!-- Table rows will be inserted here by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings View -->
+            <section id="settings-view" class="view-section">
+                <div class="card">
+                    <h2 class="text-xl font-semibold mb-4 text-gray-700">Chart Settings</h2>
+                    <div class="flex flex-col gap-6">
+                        <!-- Chart Type Selection -->
+                        <div>
+                            <label for="chart-type" class="block text-gray-700 font-medium mb-1">Chart Type</label>
+                            <select id="chart-type" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="bar">Bar Chart</option>
+                                <option value="line">Line Chart</option>
+                                <option value="pie">Pie Chart</option>
+                            </select>
+                        </div>
+                        <!-- Color Palette Selection -->
+                        <div>
+                            <label for="color-palette" class="block text-gray-700 font-medium mb-1">Color Palette</label>
+                            <select id="color-palette" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="default">Default</option>
+                                <option value="pastel">Pastel</option>
+                                <option value="vibrant">Vibrant</option>
+                            </select>
+                        </div>
+                        <!-- Data Point Count -->
+                        <div>
+                            <label for="data-count" class="block text-gray-700 font-medium mb-1">Number of Data Points: <span id="data-count-value">10</span></label>
+                            <input type="range" id="data-count" min="3" max="20" value="10" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- JavaScript for dynamic functionality -->
+    <script>
+        // Ensure the script runs only after the DOM is fully loaded.
+        window.onload = function() {
+            // --- Global State and Data ---
+            const views = document.querySelectorAll('.view-section');
+            const navButtons = document.querySelectorAll('.nav-button');
+            const chartCanvas = document.getElementById('myChart');
+
+            // Sample data for the application
+            const appData = [
+                { id: 1, product: 'Laptops', category: 'Electronics', sales: 1500 },
+                { id: 2, product: 'Smartphones', category: 'Electronics', sales: 2200 },
+                { id: 3, product: 'Coffee Maker', category: 'Appliances', sales: 750 },
+                { id: 4, product: 'Headphones', category: 'Electronics', sales: 980 },
+                { id: 5, product: 'Blender', category: 'Appliances', sales: 600 },
+                { id: 6, product: 'Desk Chair', category: 'Furniture', sales: 450 },
+                { id: 7, product: 'Keyboard', category: 'Electronics', sales: 300 },
+                { id: 8, product: 'Dining Table', category: 'Furniture', sales: 1100 },
+                { id: 9, product: 'Webcam', category: 'Electronics', sales: 400 },
+                { id: 10, product: 'Toaster', category: 'Appliances', sales: 250 },
+                { id: 11, product: 'Monitor', category: 'Electronics', sales: 850 },
+                { id: 12, product: 'Sofa', category: 'Furniture', sales: 1800 },
+                { id: 13, product: 'Microwave', category: 'Appliances', sales: 350 },
+                { id: 14, product: 'Speakers', category: 'Electronics', sales: 650 },
+                { id: 15, product: 'Bookshelf', category: 'Furniture', sales: 200 }
+            ];
+
+            // Global variables for chart and state management
+            let myChart;
+            let currentChartType = 'bar';
+            let currentDataCount = 10;
+            let currentPalette = 'default';
+
+            // --- Utility Functions ---
+
+            // Function to generate random data for demonstration
+            function generateRandomData(count) {
+                const labels = Array.from({ length: count }, (_, i) => `Data Point ${i + 1}`);
+                const data = Array.from({ length: count }, () => Math.floor(Math.random() * 500) + 100);
+                return { labels, data };
+            }
+
+            // Function to generate colors based on palette selection
+            function generateColors(count, palette) {
+                const colors = {
+                    default: [
+                        '#4299e1', '#667eea', '#9f7aea', '#d53f8c', '#ed64a6', '#f6e05e',
+                        '#48bb78', '#38b2ac', '#4fd1c5', '#718096', '#a0aec0'
+                    ],
+                    pastel: [
+                        '#a7f3d0', '#6ee7b7', '#dbeafe', '#bfdbfe', '#fef3c7', '#fde68a',
+                        '#dcfce7', '#bae6fd', '#fbcfe8', '#e9d5ff'
+                    ],
+                    vibrant: [
+                        '#ef4444', '#f97316', '#eab308', '#22c55e', '#06b6d4', '#3b82f6',
+                        '#6366f1', '#a855f7', '#d946ef', '#ef4444'
+                    ]
+                };
+                return colors[palette].slice(0, count);
+            }
+
+            // Function to update the performance metrics
+            function updateMetrics() {
+                const totalRevenue = appData.reduce((sum, item) => sum + item.sales, 0);
+                const newUsers = Math.floor(Math.random() * 500) + 100;
+                const conversionRate = (Math.random() * 5 + 2).toFixed(2); // Random rate between 2% and 7%
+
+                document.getElementById('total-revenue').innerText = `$${totalRevenue.toLocaleString()}`;
+                document.getElementById('new-users').innerText = newUsers;
+                document.getElementById('conversion-rate').innerText = `${conversionRate}%`;
+            }
+
+            // --- Core Application Logic ---
+
+            // Function to render the Chart.js visualization
+            function renderChart() {
+                // If a chart instance already exists, destroy it to prevent duplicates.
+                if (myChart) {
+                    myChart.destroy();
+                }
+
+                // Generate new data based on settings
+                const { labels, data } = generateRandomData(currentDataCount);
+                const backgroundColors = generateColors(currentDataCount, currentPalette);
+                const borderColors = backgroundColors.map(color => color.replace('1)', '0.8)'));
+
+                // Chart.js data and configuration
+                const chartConfig = {
+                    type: currentChartType,
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Sample Data',
+                            data: data,
+                            backgroundColor: backgroundColors,
+                            borderColor: borderColors,
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: currentChartType !== 'pie'
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                            }
+                        },
+                        scales: {
+                            x: {
+                                display: currentChartType !== 'pie'
+                            },
+                            y: {
+                                display: currentChartType !== 'pie',
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                };
+
+                // Create the new chart instance
+                myChart = new Chart(chartCanvas, chartConfig);
+            }
+
+            // Function to populate the data table
+            function renderTable() {
+                const tableBody = document.getElementById('data-table-body');
+                // Clear any existing rows
+                tableBody.innerHTML = '';
+                
+                appData.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.id}</td>
+                        <td>${item.product}</td>
+                        <td>${item.category}</td>
+                        <td>$${item.sales.toLocaleString()}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+
+            // Function to handle view switching
+            function switchView(viewId) {
+                // Hide all view sections
+                views.forEach(view => {
+                    view.classList.remove('active');
+                });
+                // Show the selected view
+                document.getElementById(viewId).classList.add('active');
+
+                // Update active navigation button style
+                navButtons.forEach(button => {
+                    if (button.dataset.view === viewId) {
+                        button.classList.add('active');
+                    } else {
+                        button.classList.remove('active');
+                    }
+                });
+
+                // Re-render components that are now visible
+                if (viewId === 'dashboard-view') {
+                    renderChart();
+                    updateMetrics();
+                } else if (viewId === 'table-view') {
+                    renderTable();
+                }
+            }
+
+            // --- Event Listeners ---
+
+            // Add click listeners to navigation buttons
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const viewId = button.dataset.view;
+                    switchView(viewId);
+                });
+            });
+
+            // Listen for changes in settings
+            const chartTypeSelect = document.getElementById('chart-type');
+            const colorPaletteSelect = document.getElementById('color-palette');
+            const dataCountInput = document.getElementById('data-count');
+            const dataCountValue = document.getElementById('data-count-value');
+
+            chartTypeSelect.addEventListener('change', (e) => {
+                currentChartType = e.target.value;
+                renderChart();
+            });
+
+            colorPaletteSelect.addEventListener('change', (e) => {
+                currentPalette = e.target.value;
+                renderChart();
+            });
+
+            dataCountInput.addEventListener('input', (e) => {
+                currentDataCount = parseInt(e.target.value);
+                dataCountValue.innerText = currentDataCount;
+                renderChart();
+            });
+            
+            // Initial render of the dashboard on page load
+            switchView('dashboard-view');
+        };
+    </script>
+</body>
+</html>
