@@ -7,7 +7,7 @@ Bot = ChatBot(name='Calculator',
               storage_adapter="chatterbot.storage.SQLStorageAdapter")
 
 os.system('cls' if os.name == 'nt' else 'clear')
-print("Hello, I am a calculator. How may I help you?")
+print("Hello, I am your calculator buddy. How may I help you?")
 while (True):
 
     user_input = input("me: ")
@@ -20,4 +20,5 @@ while (True):
         response = Bot.get_response(user_input)
         print("Calculator:", response)
     except:
+
         print("Calculator: Please enter valid input.")
